@@ -123,7 +123,6 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
      * Transitively add specified maven artifacts to compile classpath in addition to elements
      * calculated according to OSGi rules. All packages from additional entries will be accessible
      * at compile time.
-     * 
      * Useful when OSGi runtime classpath contains elements not defined using normal dependency
      * mechanisms. For example, when Eclipse Equinox is started from application server with
      * -Dosgi.parentClassloader=fwk parameter.
@@ -143,7 +142,6 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
      * elements in <code>toolchains.xml</code>. If the BREEs version is 9 or later and the ID did
      * not match any element, the version of the BREE will be matched against the version of the JDK
      * toolchain elements. Example:
-     * 
      * <pre>
      * &lt;toolchains&gt;
      *   &lt;toolchain&gt;
@@ -158,15 +156,11 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
      *   &lt;/toolchain&gt;
      * &lt;/toolchains&gt;
      * </pre>
-     * 
      * The default value of the bootclasspath used for compilation is
      * <code>&lt;jdkHome&gt;/lib/*;&lt;jdkHome&gt;/lib/ext/*;&lt;jdkHome&gt;/lib/endorsed/*</code> .
-     * 
      * For JDKs with different filesystem layouts, the bootclasspath can be specified explicitly in
      * the configuration section.
-     * 
      * Example:
-     * 
      * <pre>
      * &lt;configuration&gt;
      *   &lt;jdkHome&gt;/path/to/jdk/1.5&lt;/jdkHome&gt;
@@ -180,7 +174,6 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
      *   &lt;/bootClassPath&gt;
      * &lt;/configuration&gt;
      * </pre>
-     * 
      */
     @Parameter(defaultValue = "SYSTEM")
     private JDKUsage useJDK;
@@ -248,7 +241,6 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
      * Controls how additional pom dependencies are handled that are not used in the dependency
      * computation of the bundle. This can be used to have compile only dependencies, e.g.
      * annotations that are only have class or source retention.
-     * 
      * Possible values are:
      * <ul>
      * <li>consider (default) - pom dependencies not used already are added to the compile class
@@ -270,20 +262,16 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
     /**
      * Whether all resources in the source folders should be copied to
      * ${project.build.outputDirectory}.
-     * 
      * <code>true</code> (default) means that all resources are copied from the source folders to
      * <code>${project.build.outputDirectory}</code>.
-     * 
      * <code>false</code> means that no resources are copied from the source folders to
      * <code>${project.build.outputDirectory}</code>.
-     * 
      * Set this to <code>false</code> in case you want to keep resources separate from java files in
      * <code>src/main/resources</code> and handle them using
      * <a href="https://maven.apache.org/plugins/maven-resources-plugin/">
      * maven-resources-plugin</a> (e.g. for <a href=
      * "https://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html">resource
      * filtering<a/>.
-     * 
      */
     @Parameter(defaultValue = "true")
     private boolean copyResources;
@@ -300,24 +288,18 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
      * The format of the compiler log file. <code>plain</code> will log into a plain text file
      * (.log), <code>xml</code> will log in xml format (.xml). If omitted, no logging into files is
      * done. The log file name is derived from the jar file name:
-     * 
      * <pre>
      * Example:
      * build.properties:
-     * 
-     * output.lib1/library.jar = lib1bin/ 
-     * output.lib2/library.jar = lib2bin/ 
+     * output.lib1/library.jar = lib1bin/
+     * output.lib2/library.jar = lib2bin/
      * output.. = bin/
-     * 
      * And a configuration:
-     * 
      * &lt;configuration&gt;
      *   &lt;logDirectory&gt;${project.build.directory}/logfiles&lt;/logDirectory&gt;
-     *   &lt;log&gt;xml&lt;/log&gt; 
+     *   &lt;log&gt;xml&lt;/log&gt;
      * &lt;/configuration&gt;
-     * 
      * Will produce the following log files
-     * 
      * ${project.build.directory}/logfiles/@dot.xml
      * ${project.build.directory}/logfiles/lib1_library.jar.xml
      * ${project.build.directory}/logfiles/lib2_library.jar.xml
@@ -373,15 +355,15 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
             return;
         }
         Map<File, List<SourcepathEntry>> outputMap = sourcepath.stream().collect(
-                Collectors.groupingBy(SourcepathEntry::getOutputDirectory, LinkedHashMap::new, Collectors.toList()));
+            Collectors.groupingBy(SourcepathEntry::getOutputDirectory, LinkedHashMap::new, Collectors.toList()));
 
         for (Entry<File, List<SourcepathEntry>> entry : outputMap.entrySet()) {
             this.currentOutputDirectory = entry.getKey();
             this.currentOutputDirectory.mkdirs();
             this.currentSourceRoots = entry.getValue().stream().map(SourcepathEntry::getSourcesRoot)
-                    .map(root -> new File(root.toURI().normalize()).toString()).toList();
+                .map(root -> new File(root.toURI().normalize()).toString()).toList();
             this.currentExcludes = entry.getValue().stream().map(SourcepathEntry::getExcludes).filter(Objects::nonNull)
-                    .flatMap(Collection::stream).distinct().toList();
+                .flatMap(Collection::stream).distinct().toList();
             super.execute();
             doCopyResources();
         }
@@ -421,15 +403,17 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
             try {
                 try (Stream<Path> stream = Files.list(versionFolder.toPath())) {
                     return stream.filter(p -> Files.isDirectory(p)).map(Path::getFileName).map(String::valueOf)
-                            .map(name -> {
-                                try {
-                                    return Integer.parseInt(name);
-                                } catch (NumberFormatException e) {
-                                    return null;
-                                }
-                            }).filter(Objects::nonNull).sorted().collect(Collectors.toCollection(LinkedHashSet::new));
+                        .map(name -> {
+                            try {
+                                return Integer.parseInt(name);
+                            }
+                            catch (NumberFormatException e) {
+                                return null;
+                            }
+                        }).filter(Objects::nonNull).sorted().collect(Collectors.toCollection(LinkedHashSet::new));
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 //then it can't work!
                 getLog().warn("Can't list version folders: " + e);
 
@@ -441,7 +425,7 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
     /**
      * Subclasses might override this method to perform final tasks and as a last opportunity to
      * fail the compile
-     * 
+     *
      * @throws MojoExecutionException
      */
     protected void doFinish() throws MojoExecutionException {
@@ -455,11 +439,11 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         if (currentRelease != null) {
             //if there is an explicit release set we know the release and there must be a suitable EE provided
             return new StandardExecutionEnvironment[] { ExecutionEnvironmentUtils
-                    .getExecutionEnvironment("JavaSE-" + currentRelease, toolchainManager, session, logger) };
+                .getExecutionEnvironment("JavaSE-" + currentRelease, toolchainManager, session, logger) };
         }
         if (manifestBREEs == null) {
             manifestBREEs = tychoProjectManager.getExecutionEnvironments(project, session)
-                    .toArray(ExecutionEnvironment[]::new);
+                .toArray(ExecutionEnvironment[]::new);
         }
         return manifestBREEs;
     }
@@ -500,16 +484,20 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
                 for (CopyMapping.SourceTargetPair sourceTargetPair : copyMapping.getSourceTargetPairs()) {
                     FileUtils.copyFile(new File(sourceRoot, sourceTargetPair.source), sourceTargetPair.target);
                 }
-            } catch (InclusionScanException e) {
+            }
+            catch (InclusionScanException e) {
                 throw new MojoExecutionException("Exception while scanning for resource files in " + sourceRoot, e);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new MojoExecutionException(
-                        "Exception copying resource files from " + sourceRoot + " to " + getOutputDirectory(), e);
+                    "Exception copying resource files from " + sourceRoot + " to " + getOutputDirectory(), e);
             }
         }
     }
 
-    /** public for testing purposes */
+    /**
+     * public for testing purposes
+     */
     public EclipsePluginProject getEclipsePluginProject() throws MojoExecutionException {
         return ((OsgiBundleProject) getBundleProject()).getEclipsePluginProject(DefaultReactorProject.adapt(project));
     }
@@ -521,6 +509,7 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
 
     @Override
     public List<String> getClasspathElements() throws MojoExecutionException {
+
         Collection<ProjectClasspathEntry> classpathEntries = getEclipsePluginProject().getClasspathEntries();
         final List<String> classpath = new ArrayList<>();
         Set<String> seen = new HashSet<>();
@@ -529,17 +518,34 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         List<ContainerAccessRule> globalRules;
         if (useAccessRules) {
             globalRules = classpathEntries.stream().filter(PluginDependenciesClasspathContainer.class::isInstance)
-                    .map(PluginDependenciesClasspathContainer.class::cast).map(ClasspathContainerEntry::getAccessRules)
-                    .findFirst().orElse(List.of());
-        } else {
+                .map(PluginDependenciesClasspathContainer.class::cast).map(ClasspathContainerEntry::getAccessRules)
+                .findFirst().orElse(List.of());
+        }
+        else {
             globalRules = List.of();
         }
+
+        Map<File, Artifact> dependencyArtifactsByPath = getDependencyArtifactsByPath();
+        getLog().info("Found " + dependencyArtifactsByPath.size() + " artifact paths");
+
         for (ClasspathEntry cpe : getClasspath()) {
+            List<Artifact> artifacts = cpe.getLocations().stream()
+                .map(path -> dependencyArtifactsByPath.get(path))
+                .filter(Objects::nonNull)
+                .toList();
+            artifacts.forEach(
+                artifact -> getLog().info(
+                    String.format("<dependency>\n"
+                            + "\t<groupId>%s</groupId>\n"
+                            + "\t<artifactId>%s</artifactId>\n"
+                            + "</dependency>",
+                        artifact.getGroupId(), artifact.getArtifactId())));
+
             Stream<File> classpathLocations = Stream
-                    .concat(cpe.getLocations().stream(),
-                            Optional.ofNullable(cpe.getMavenProject())
-                                    .map(mp -> mp.getBuildDirectory().getOutputDirectory()).stream())
-                    .filter(AbstractOsgiCompilerMojo::isValidLocation).distinct();
+                .concat(cpe.getLocations().stream(),
+                    Optional.ofNullable(cpe.getMavenProject())
+                        .map(mp -> mp.getBuildDirectory().getOutputDirectory()).stream())
+                .filter(AbstractOsgiCompilerMojo::isValidLocation).distinct();
             classpathLocations.forEach(location -> {
                 String path = location.getAbsolutePath();
                 String entry = path + toString(cpe.getAccessRules(), globalRules, useAccessRules);
@@ -566,10 +572,10 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         }
         if (pomOnlyDependencies != PomDependencies.ignore) {
             List<Artifact> additionalClasspathEntries = getBundleProject()
-                    .getInitialArtifacts(DefaultReactorProject.adapt(project), List.of(getDependencyScope())).stream() //
-                    .filter(a -> isValidLocation(a.getFile())) //
-                    .filter(a -> includedPathes.add(a.getFile().getAbsolutePath())) //
-                    .toList();
+                .getInitialArtifacts(DefaultReactorProject.adapt(project), List.of(getDependencyScope())).stream() //
+                .filter(a -> isValidLocation(a.getFile())) //
+                .filter(a -> includedPathes.add(a.getFile().getAbsolutePath())) //
+                .toList();
             for (Artifact artifact : additionalClasspathEntries) {
                 ArtifactHandler artifactHandler = artifact.getArtifactHandler();
                 if (artifactHandler.isAddedToClasspath() && inScope(artifact.getScope())) {
@@ -580,6 +586,14 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
             }
         }
         return classpath;
+    }
+
+    private Map<File, Artifact> getDependencyArtifactsByPath() {
+        ArtifactRepository repository = session.getLocalRepository();
+        return project.getDependencyArtifacts().stream()
+            .map(a -> repository.find(a))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toMap(a -> new File(repository.getBasedir(), repository.pathOf(a)), a -> a));
     }
 
     private boolean inScope(String dependencyScope) {
@@ -607,23 +621,23 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
     }
 
     private String toString(Collection<AccessRule> entryRules, List<ContainerAccessRule> containerRules,
-            boolean useAccessRules) {
+        boolean useAccessRules) {
         if (useAccessRules) {
             StringJoiner result = new StringJoiner(RULE_SEPARATOR, "[", "]"); // include all
             if (entryRules != null) {
                 for (ContainerAccessRule rule : containerRules) {
                     switch (rule.getKind()) {
-                    case ACCESSIBLE:
-                        result.add("+" + rule.getPattern());
-                        break;
-                    case DISCOURAGED:
-                        result.add("~" + rule.getPattern());
-                        break;
-                    case NON_ACCESSIBLE:
-                        result.add("-" + rule.getPattern());
-                        break;
-                    default:
-                        break;
+                        case ACCESSIBLE:
+                            result.add("+" + rule.getPattern());
+                            break;
+                        case DISCOURAGED:
+                            result.add("~" + rule.getPattern());
+                            break;
+                        case NON_ACCESSIBLE:
+                            result.add("-" + rule.getPattern());
+                            break;
+                        default:
+                            break;
                     }
                 }
                 if (entryRules != null) {
@@ -632,7 +646,8 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
                     }
                 }
                 result.add(RULE_EXCLUDE_ALL);
-            } else {
+            }
+            else {
                 return "";
             }
             return result.toString();
@@ -656,7 +671,8 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
 
         if (includes.isEmpty() && excludes.isEmpty()) {
             scanner = new StaleSourceScanner(staleMillis);
-        } else {
+        }
+        else {
             if (includes.isEmpty()) {
                 includes.add("**/*.java");
             }
@@ -671,8 +687,9 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
 
         if (includes.isEmpty() && excludes.isEmpty()) {
             includes = Collections.singleton("**/*." + inputFileEnding);
-            scanner = new SimpleSourceInclusionScanner(includes, Collections.<String> emptySet());
-        } else {
+            scanner = new SimpleSourceInclusionScanner(includes, Collections.<String>emptySet());
+        }
+        else {
             if (includes.isEmpty()) {
                 includes.add("**/*." + inputFileEnding);
             }
@@ -684,26 +701,27 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
 
     @Override
     protected CompilerConfiguration getCompilerConfiguration(List<String> compileSourceRoots,
-            List<String> compileSourceExcludes) throws MojoExecutionException, MojoFailureException {
+        List<String> compileSourceExcludes) throws MojoExecutionException, MojoFailureException {
         CompilerConfiguration compilerConfiguration = super.getCompilerConfiguration(compileSourceRoots,
-                compileSourceExcludes);
+            compileSourceExcludes);
         if (useProjectSettings) {
             Path prefsFilePath = tychoProjectManager.getEclipseProject(project)
-                    .map(eclipse -> eclipse.getFile(PREFS_FILE_PATH))
-                    .orElseGet(() -> new File(project.getBasedir(), PREFS_FILE_PATH).toPath());
+                .map(eclipse -> eclipse.getFile(PREFS_FILE_PATH))
+                .orElseGet(() -> new File(project.getBasedir(), PREFS_FILE_PATH).toPath());
 
             if (Files.isRegularFile(prefsFilePath)) {
                 // make sure that "-properties" is the first custom argument, otherwise it's not possible to override
                 // any project setting on the command line because the last argument wins.
                 List<Entry<String, String>> copy = new ArrayList<>(
-                        compilerConfiguration.getCustomCompilerArgumentsEntries());
+                    compilerConfiguration.getCustomCompilerArgumentsEntries());
                 compilerConfiguration.getCustomCompilerArgumentsEntries().clear();
                 addCompilerCustomArgument(compilerConfiguration, "-properties",
-                        prefsFilePath.toAbsolutePath().toString());
+                    prefsFilePath.toAbsolutePath().toString());
                 compilerConfiguration.getCustomCompilerArgumentsEntries().addAll(copy);
-            } else {
+            }
+            else {
                 getLog().debug("Parameter 'useProjectSettings' is set to true, but preferences file '" + prefsFilePath
-                        + "' could not be found");
+                    + "' could not be found");
             }
         }
         compilerConfiguration.setTargetVersion(getTargetLevel());
@@ -735,14 +753,15 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         }
         if (compilerConfiguration.getCustomCompilerArgumentsAsMap().containsKey("-log")) {
             throw new MojoFailureException("Compiler logging is configured by the 'log' compiler"
-                    + " plugin parameter and the custom compiler argument '-log'. Only either of them is allowed.");
+                + " plugin parameter and the custom compiler argument '-log'. Only either of them is allowed.");
         }
         logDirectory.mkdirs();
         String logFileName = null;
         if (new File(project.getBuild().getOutputDirectory()).getAbsolutePath()
-                .equals(getOutputDirectory().getAbsolutePath())) {
+            .equals(getOutputDirectory().getAbsolutePath())) {
             logFileName = "@dot";
-        } else {
+        }
+        else {
             String suffix = "-classes";
             String basePath = new File(project.getBuild().getDirectory()).getAbsolutePath();
             String subPath = getOutputDirectory().getAbsolutePath().substring(basePath.length()).replace('\\', '/');
@@ -752,7 +771,8 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
             String name = subPath.replaceAll("/", "_");
             if (name.endsWith(suffix)) {
                 logFileName = name.substring(0, name.length() - suffix.length());
-            } else {
+            }
+            else {
                 logFileName = name;
             }
         }
@@ -769,7 +789,7 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
     }
 
     private void configureBootclasspathAccessRules(CompilerConfiguration compilerConfiguration,
-            Collection<ProjectClasspathEntry> classpathEntries) throws MojoExecutionException {
+        Collection<ProjectClasspathEntry> classpathEntries) throws MojoExecutionException {
         List<AccessRule> accessRules = new ArrayList<>();
         if (!requireJavaPackageImports) {
             accessRules.add(new DefaultAccessRule("java/**", false));
@@ -777,16 +797,16 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         accessRules.addAll(getStrictBootClasspathAccessRules());
         if (!accessRules.isEmpty()) {
             List<ContainerAccessRule> globalRules = classpathEntries.stream()
-                    .filter(JREClasspathEntry.class::isInstance).map(JREClasspathEntry.class::cast)
-                    .map(ClasspathContainerEntry::getAccessRules).findFirst().orElse(List.of());
+                .filter(JREClasspathEntry.class::isInstance).map(JREClasspathEntry.class::cast)
+                .map(ClasspathContainerEntry::getAccessRules).findFirst().orElse(List.of());
             addCompilerCustomArgument(compilerConfiguration, "org.osgi.framework.system.packages",
-                    toString(accessRules, globalRules, true));
+                toString(accessRules, globalRules, true));
         }
     }
 
     private List<AccessRule> getStrictBootClasspathAccessRules() throws MojoExecutionException {
         return ((OsgiBundleProject) getBundleProject()).getBundleClassPath(DefaultReactorProject.adapt(project))
-                .getStrictBootClasspathAccessRules();
+            .getStrictBootClasspathAccessRules();
     }
 
     private void configureJavaHome(CompilerConfiguration compilerConfiguration) throws MojoExecutionException {
@@ -795,16 +815,17 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
             String toolchainId;
             if (brees.length > 0) {
                 toolchainId = brees[0].getProfileName();
-            } else {
+            }
+            else {
                 getLog().warn(
-                        "useJDK=BREE configured, but no BREE is set in bundle. Fail back to currently running execution environment ("
-                                + getTargetExecutionEnvironment().getProfileName() + ").");
+                    "useJDK=BREE configured, but no BREE is set in bundle. Fail back to currently running execution environment ("
+                        + getTargetExecutionEnvironment().getProfileName() + ").");
                 toolchainId = getTargetExecutionEnvironment().getProfileName();
             }
             OSGiJavaToolchain osgiToolchain = toolchainProvider.getToolchain(useJDK, toolchainId)
-                    .orElseThrow(() -> new MojoExecutionException(
-                            "useJDK = BREE configured, but no toolchain of type 'jdk' with id '" + toolchainId
-                                    + "' found. See https://maven.apache.org/guides/mini/guide-using-toolchains.html"));
+                .orElseThrow(() -> new MojoExecutionException(
+                    "useJDK = BREE configured, but no toolchain of type 'jdk' with id '" + toolchainId
+                        + "' found. See https://maven.apache.org/guides/mini/guide-using-toolchains.html"));
             addCompilerCustomArgument(compilerConfiguration, "use.java.home", osgiToolchain.getJavaHome());
             configureBootClassPath(compilerConfiguration, osgiToolchain);
         }
@@ -820,7 +841,7 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
                     Xpp3Dom[] includes = includeParent.getChildren("include");
                     if (includes.length > 0) {
                         addCompilerCustomArgument(compilerConfiguration, "-bootclasspath", scanBootclasspath(
-                                osgiToolchain.getJavaHome(), includes, bootClassPath.getChild("excludes")));
+                            osgiToolchain.getJavaHome(), includes, bootClassPath.getChild("excludes")));
                     }
                 }
             }
@@ -875,14 +896,15 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         String dependencyScope = getDependencyScope();
         if (Artifact.SCOPE_TEST.equals(dependencyScope)) {
             classpath = new ArrayList<>(getBundleProject().getTestClasspath(DefaultReactorProject.adapt(project)));
-        } else {
+        }
+        else {
             ReactorProject reactorProject = DefaultReactorProject.adapt(project);
             classpath = new ArrayList<>(getBundleProject().getClasspath(reactorProject));
         }
         if (extraClasspathElements != null) {
             try {
                 Collection<Artifact> resolved = dependenciesResolver.resolve(project,
-                        Arrays.asList(extraClasspathElements), List.of(dependencyScope), session);
+                    Arrays.asList(extraClasspathElements), List.of(dependencyScope), session);
                 for (Artifact b : resolved) {
                     ReactorProject bProject = null;
                     if (b instanceof ProjectArtifact projectArtifact) {
@@ -891,13 +913,14 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
                     ArrayList<File> bLocations = new ArrayList<>();
                     bLocations.add(b.getFile());
                     classpath
-                            .add(new DefaultClasspathEntry(bProject,
-                                    ((OsgiBundleProject) getBundleProject()).readOrCreateArtifactKey(b.getFile(),
-                                            () -> new DefaultArtifactKey(b.getType(),
-                                                    b.getGroupId() + "." + b.getArtifactId(), b.getVersion())),
-                                    bLocations, null));
+                        .add(new DefaultClasspathEntry(bProject,
+                            ((OsgiBundleProject) getBundleProject()).readOrCreateArtifactKey(b.getFile(),
+                                () -> new DefaultArtifactKey(b.getType(),
+                                    b.getGroupId() + "." + b.getArtifactId(), b.getVersion())),
+                            bLocations, null));
                 }
-            } catch (DependencyCollectionException | DependencyResolutionException e) {
+            }
+            catch (DependencyCollectionException | DependencyResolutionException e) {
                 throw new MojoExecutionException("Could not resolve extra classpath entry", e);
             }
         }
@@ -909,17 +932,18 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
                     classpath.addAll(list);
                 }
             });
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new MojoExecutionException("can't call classpath contributors", e);
         }
         LinkedHashMap<ArtifactKey, List<ClasspathEntry>> classpathMap = classpath.stream().collect(Collectors
-                .groupingBy(cpe -> normalizedKey(cpe.getArtifactKey()), LinkedHashMap::new, Collectors.toList()));
+            .groupingBy(cpe -> normalizedKey(cpe.getArtifactKey()), LinkedHashMap::new, Collectors.toList()));
         if (logger.isDebugEnabled()) {
             for (var entry : classpathMap.entrySet()) {
                 List<ClasspathEntry> list = entry.getValue();
                 if (list.size() > 1) {
                     logger.info("The following classpath entries are not unique for the artifact key " + entry.getKey()
-                            + " and will be merged:");
+                        + " and will be merged:");
                     for (ClasspathEntry cpe : list) {
                         logger.info("\tLocations: " + cpe.getLocations());
                         Collection<AccessRule> rules = cpe.getAccessRules();
@@ -966,8 +990,8 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
                 public String toString() {
                     ReactorProject mavenProject = getMavenProject();
                     return "MergedClasspathEntry [key=" + getArtifactKey() + ", project="
-                            + (mavenProject != null ? mavenProject.getId() : "null") + ", locations=" + getLocations()
-                            + ", rules=" + getAccessRules() + "]";
+                        + (mavenProject != null ? mavenProject.getId() : "null") + ", locations=" + getLocations()
+                        + ", rules=" + getAccessRules() + "]";
                 }
 
             });
@@ -1009,7 +1033,8 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
                 if (getBundleProject().getArtifactKey(rp) == key) {
                     return rp;
                 }
-            } catch (RuntimeException | MojoExecutionException e) {
+            }
+            catch (RuntimeException | MojoExecutionException e) {
                 //can't find the artifact key then!
             }
         }
@@ -1030,14 +1055,14 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         String profileName = getEclipsePluginProject().getBuildProperties().getJreCompilationProfile();
         if (profileName != null) {
             return ExecutionEnvironmentUtils.getExecutionEnvironment(profileName, toolchainManager, session, logger)
-                    .getCompilerSourceLevelDefault();
+                .getCompilerSourceLevelDefault();
         }
         return Arrays.stream(getBREE()) //
-                .map(ExecutionEnvironment::getCompilerSourceLevelDefault) //
-                .filter(Objects::nonNull) //
-                .min(Comparator.comparing(Version::parseVersion)) //
-                .or(() -> Optional.ofNullable(getTargetExecutionEnvironment().getCompilerSourceLevelDefault())) //
-                .orElse(DEFAULT_SOURCE_VERSION);
+            .map(ExecutionEnvironment::getCompilerSourceLevelDefault) //
+            .filter(Objects::nonNull) //
+            .min(Comparator.comparing(Version::parseVersion)) //
+            .or(() -> Optional.ofNullable(getTargetExecutionEnvironment().getCompilerSourceLevelDefault())) //
+            .orElse(DEFAULT_SOURCE_VERSION);
     }
 
     @Override
@@ -1054,14 +1079,14 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         String profileName = getEclipsePluginProject().getBuildProperties().getJreCompilationProfile();
         if (profileName != null) {
             return ExecutionEnvironmentUtils.getExecutionEnvironment(profileName, toolchainManager, session, logger)
-                    .getCompilerTargetLevelDefault();
+                .getCompilerTargetLevelDefault();
         }
         return Arrays.stream(getBREE()) //
-                .map(ExecutionEnvironment::getCompilerTargetLevelDefault) //
-                .filter(Objects::nonNull) //
-                .min(Comparator.comparing(Version::parseVersion)) //
-                .or(() -> Optional.ofNullable(getTargetExecutionEnvironment().getCompilerTargetLevelDefault())) //
-                .orElse(DEFAULT_TARGET_VERSION);
+            .map(ExecutionEnvironment::getCompilerTargetLevelDefault) //
+            .filter(Objects::nonNull) //
+            .min(Comparator.comparing(Version::parseVersion)) //
+            .or(() -> Optional.ofNullable(getTargetExecutionEnvironment().getCompilerTargetLevelDefault())) //
+            .orElse(DEFAULT_TARGET_VERSION);
     }
 
     @Override
@@ -1085,19 +1110,22 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         String releaseLevel;
         if (targetLevelSplit.length == 1 && targetLevelSplit[0].matches("\\d+")) {
             releaseLevel = targetLevelSplit[0];
-        } else if (targetLevelSplit.length == 2 && "1".equals(targetLevelSplit[0])
-                && targetLevelSplit[1].matches("\\d+")) {
+        }
+        else if (targetLevelSplit.length == 2 && "1".equals(targetLevelSplit[0])
+            && targetLevelSplit[1].matches("\\d+")) {
             releaseLevel = targetLevelSplit[1];
-        } else {
+        }
+        else {
             logger.debug("Cannot determining 'maven.compiler.release' property automatically, because target level '"
-                    + targetLevel + "' has an unexpected format.");
+                + targetLevel + "' has an unexpected format.");
             return null;
         }
 
         CtSym ctSym;
         try {
             ctSym = JRTUtil.getCtSym(Paths.get(System.getProperty("java.home")));
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.warn("Unable to determine 'maven.compiler.release' property automatically", e);
             return null;
         }
@@ -1105,20 +1133,21 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         // TODO: Replace this with CtSym#getReleaseCode(String) once eclipse.jdt.core/5ba272a2d4a7478e0eb3951208ab49b7c069f37d is available with newer ECJ release
         int releaseLevelInt = Integer.parseInt(releaseLevel);
         String releaseCode = releaseLevelInt < 10 ? releaseLevel
-                : String.valueOf((char) ('A' + (releaseLevelInt - 10)));
+            : String.valueOf((char) ('A' + (releaseLevelInt - 10)));
 
         List<Path> releaseRoots = ctSym.releaseRoots(releaseCode);
         if (!releaseRoots.isEmpty()) {
             return releaseLevel;
-        } else {
+        }
+        else {
             logger.debug("Not determining 'maven.compiler.release' property automatically, because level '"
-                    + releaseLevel + "' is not supported by compiler.");
+                + releaseLevel + "' is not supported by compiler.");
             return null;
         }
     }
 
     private void checkTargetLevelCompatibleWithManifestBREEs(String effectiveTargetLevel,
-            ExecutionEnvironment[] manifestBREEs) throws MojoExecutionException {
+        ExecutionEnvironment[] manifestBREEs) throws MojoExecutionException {
         List<String> incompatibleBREEs = new ArrayList<>();
         for (ExecutionEnvironment ee : manifestBREEs) {
             if (!ee.isCompatibleCompilerTargetLevel(effectiveTargetLevel)) {
@@ -1127,8 +1156,8 @@ public abstract class AbstractOsgiCompilerMojo extends AbstractCompilerMojo impl
         }
         if (!incompatibleBREEs.isEmpty()) {
             String message = "The effective compiler target level " + effectiveTargetLevel
-                    + " is incompatible with the following OSGi execution environments: " + incompatibleBREEs + " @ "
-                    + project;
+                + " is incompatible with the following OSGi execution environments: " + incompatibleBREEs + " @ "
+                + project;
             if (strictCompilerTarget) {
                 throw new MojoExecutionException(message);
             }
